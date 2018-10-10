@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Clock</title>
+		<!--React dev-->
+		<script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
+		<script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+		
+		<!-- hayes ephemeris for sun & moon positions -->
+		<script language="JavaScript" type="text/javascript" src="hayes/util.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/datetime.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/observer.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/sun.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/moon.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/planets.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/stars.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/separation.js"></script>
+		<script language="JavaScript" type="text/javascript" src="hayes/math.js"></script>
+		
+		<!--style sheet-->
+		<link href="style.css" rel="stylesheet" />
+		
+		<!--load google fonts-->
+		<link href="https://fonts.googleapis.com/css?family=Vesper+Libre" rel="stylesheet">
+		
+		
+	</head>
+	<body>
+		<div id="root"></div>
+		<script language="JavaScript" type="text/javascript">
+			Date.prototype.stdTimezoneOffset = function() {
+				  var jan = new Date(this.getFullYear(), 0, 1);
+				  var jul = new Date(this.getFullYear(), 6, 1);
+				  return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+				}				
+		</script>
+		<script type="text/babel">			
+			class App extends React.Component {
+				render() {
+					var appStyle = {
+						width: 500,
+						border: "5px solid black",
+						borderRadius: 20,
+						margin: "0 auto 0 auto",
+						padding: "10px"
+					};	
+					return (
+						<div style={appStyle}>
+							<Clock />
+						</div>
+					)
+				}
+			}
+			class Clock extends React.Component {
+				constructor(props) {
+					super(props);					
+					this.state = {
+						date: "",
+						time: "",
+						autoUpdate: true
+					}									
+				}
+				componentWillMount() {
+					var location = new place("GB:Greenwich","51:28:38",0,"00:00:00",0,0,"","");
+					observer = new observatory(location);
+					var d = new Date();
+					this.setState({
+					  date: d.toLocaleDateString(),
+					  time: d.toLocaleTimeString()
+					});
+					var sunAndMoonData = this.getData(observer, d);
+					this.setState((state) => { 
+						return sunAndMoonData;
+					});				
+				}
+				componentDidMount() {
+					this.setTimer();
+				}
+				
+				componentDidUpdate() {
+					if (this.state.autoUpdate == false) {						
+						clearInterval(this.timerID);
+					} 
+				}
+				componentWillUnmount() {
+					clearInterval(this.timerID);
+				}
+				
+				convertDegrees(degrees) { //converts from degrees to dd:mm:ss
+					var dd = Math.floor(degrees);
+					var mm = Math.floor(((degrees - dd) * 60));
+					var ss = Math.floor((degrees - dd - (mm/60)) * 3600);
+					return dd + ":" + mm + ":" + ss;
+				}
+						
+				setTimer() {
+					this.timerID = setInterval(
+							() => this.tick(),
+							1000
+						);	
+				}
+				tick() {
+					if (this.state.autoUpdate == true) {
+						var d = new Date();
+						this.setState({
+						  date: d.toLocaleDateString(),
+						  time: d.toLocaleTimeString()
+						});
+						var sunAndMoonData = this.getData(observer, d);
+						this.setState((state) => { 
+							return sunAndMoonData;
+						});
+					}
+				}
+				getData(observer, d) {
+					observer.setDate(d);
+					var sunData = doSun(observer,0);
+					var moonData = doMoon(observer,0);
+					var sunHouseIndex = this.determineHouseIndex(sunData.rightAscension);
+					var moonHouseIndex = this.determineHouseIndex(moonData.rightAscension);
+					var sunHouseName = this.converter(sunHouseIndex, "h");
+					var moonHouseName = this.converter(moonHouseIndex, "h");
+					var dd = new Date(d);
+					var dayOfWeek = dd.getDay();										
+					var dateOutput = this.calculateThelemicYear(dd, sunHouseIndex);
+					var sunDegree = this.determineDegree(sunData.rightAscension);
+					var moonDegree = this.determineDegree(moonData.rightAscension);
+					var thelemicDay = this.converter(dayOfWeek, "d");
+					var dataObject = {
+						sunHouseName: sunHouseName,
+						moonHouseName: moonHouseName,
+						thelemicYear: dateOutput,
+						sunDegree: sunDegree,
+						moonDegree: moonDegree,
+						thelemicDay: thelemicDay
+					};
+					return dataObject;
+				}
+				calculateThelemicYear(dd, sunHouseIndex) {
+					var year = dd.getFullYear() - 1904;
+					var month = dd.getMonth();
+					if (sunHouseIndex >= 9 && month < 3) year--;
+					var y0 = Math.floor(year / 22);
+					var y1 = year % 22;
+					if (y0 == 0) {
+						var dod = "";
+					} else if (y0 < 0) {
+						y0 = Math.abs(y0);
+						var dod = "-" + this.roman(y0,1);
+					} else {
+						var dod = this.roman(y0,1);
+					}
+					if (y1 == 0) {
+						var thelemicYear = 0;
+					} else if (y1 < 1) {
+						y1 = Math.abs(y1);
+						var thelemicYear = this.roman(y1,1).toLowerCase();
+					} else {
+						var thelemicYear = this.roman(y1,1).toLowerCase();
+					}
+					return dod + thelemicYear;
+				}
+				determineHouseIndex(hour) {
+					return Math.floor(hour * 15 / 30);
+				};
+				determineDegree(hour) {
+					return Math.round((hour * 15) % 30);
+				};
+				converter(i, houseOrDay) { //index number, house = h, day = d
+					var houseSym = [
+						"!", //aries
+						"=",
+						"#",
+						"$",
+						"%",
+						"^",
+						"&",
+						"*",
+						"(",
+						")",
+						"_",
+						"+"
+					];
+					var daySym = [
+						"}", //sunday
+						"~",
+						"4",
+						"1",
+						"5",
+						"2",
+						"6"
+					];
+					if (houseOrDay == "h") {
+						return houseSym[i];
+					} else if (houseOrDay == "d") {
+						return daySym[i];
+					}
+				}
+				// Convert to Roman Numerals
+				// copyright 25th July 2005, by Stephen Chapman http://javascript.about.com
+				// permission to use this Javascript on your web page is granted
+				// provided that all of the code (including this copyright notice) is
+				// used exactly as shown
+				roman(n,s) {
+					var r = '';var d; var rn = new Array('IIII','V','XXXX','L','CCCC','D','MMMM'); for (var i=0; i< rn.length; i++) {var x = rn[i].length+1;var d = n%x; r= rn[i].substr(0,d)+r;n = (n-d)/x;} if (s) {r=r.replace(/DCCCC/g,'CM');r=r.replace(/CCCC/g,'CD');r=r.replace(/LXXXX/g,'XC');r=r.replace(/XXXX/g,'XL');r=r.replace(/VIIII/g,'IX');r=r.replace(/IIII/g,'IV');} return r;
+				}			
+				updateDateAndTime() {					
+					var date = document.getElementById("myDate");
+					var dateValue = date.value;
+					if (dateValue) {
+						this.setState({
+							autoUpdate : false
+						});
+						var time = document.getElementById("myTime");
+						var timeValue = time.value;
+
+						var valueToParse = dateValue + " " + timeValue;
+						var d = new Date(Date.parse(valueToParse));
+						var sunAndMoonData = this.getData(observer, d);
+						this.setState((state) => { 
+							return sunAndMoonData;
+						});
+						this.setState({
+						  date: d.toLocaleDateString(),
+						  time: d.toLocaleTimeString()
+						});
+					}
+				}
+				reset() {					
+					this.setState({
+						autoUpdate : true
+					});
+					this.setTimer();
+					document.getElementById("dateForm").reset();
+				}
+				
+				render() {	
+					
+					return (
+						<div>
+							<h1>Thelemic Date & Time</h1>
+							<h2><span className="astrological">}</span> in {this.state.sunDegree}&deg; <span className="astrological">{this.state.sunHouseName}</span></h2> 
+							<h2><span className="astrological">~</span> in {this.state.moonDegree}&deg; <span className="astrological">{this.state.moonHouseName}</span></h2>
+							<h2><span className="astrological">{this.state.thelemicDay}</span> &bull; {this.state.thelemicYear}</h2>
+							<h2>{this.state.date} {this.state.time}</h2>							
+							<form id="dateForm">
+								<label htmlFor="myDate">Date:</label>
+								<input type="date" id="myDate"></input>
+								<label htmlFor="myTime">Time:</label>
+								<input type="time" id="myTime"></input>
+								<button type="button" onClick={ () => this.updateDateAndTime()}>Update</button>
+								<button type="button" onClick={ () => this.reset()}>Reset</button>
+							</form>
+						</div>
+					);										
+				}
+			}
+					
+			ReactDOM.render(
+				<div>
+					<App />
+				</div>,
+				document.getElementById('root')
+			);
+			
+			
+	</script>
+	</body>
+	
+</html>

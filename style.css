@@ -1,0 +1,17 @@
+@font-face {
+	font-family: 'Astrological';
+	src:url('fonts/Astrological.ttf.woff') format('woff'),
+	url('fonts/Astrological.ttf.svg#Astrological') format('svg'),
+	url('fonts/Astrological.ttf.eot'),
+	url('fonts/Astrological.ttf.eot?#iefix') format('embedded-opentype'); 
+	font-weight: normal;
+	font-style: normal;
+}	
+
+body {
+	font-family: 'Arial';
+}
+
+.astrological {
+	font-family: 'Astrological';
+}
