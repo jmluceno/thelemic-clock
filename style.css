@@ -9,9 +9,16 @@
 }	
 
 body {
-	font-family: 'Arial';
+	font-family: Arial;
 }
 
 .astrological {
 	font-family: 'Astrological';
+}
+
+.transparentCover {
+	padding: 27px 0 20px 0;
+	background-color: rgba(0,0,0,0.3);
+	border-radius: 20px;
+	height: 35px;
 }
