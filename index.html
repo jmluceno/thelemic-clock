@@ -315,10 +315,12 @@
 				render() {	
 					var clockStyle = {
 						textAlign: "center",
-						fontSize: "27px"
+						fontSize: "34px"
 					}
 					var formStyle = {
-						paddingBottom: "20px"
+						paddingBottom: "20px",
+						clear: "both",
+						fontSize: "24px"
 					}
 					var solContainer = {
 						width: "100%",
@@ -345,7 +347,7 @@
 					}
 					var yearContainer = {
 						width: "47.5%",
-						height: "82px",
+						height: "94px",
 						borderRadius: 20,
 						textAlign: "center",
 						backgroundColor: this.state.yearScale,
@@ -361,18 +363,26 @@
 						color: "#fff",
 						width: "93%",
 						margin: "20px auto 10px auto"
+
 					}
 					var titleBoxStyle = {
 						width: "100%",
 						backgroundColor: "#000",
 						color: "#FFF",
 						textAlign: "center",
-						fontSize: "1.5em",
 						borderTopRightRadius: 14,
 						borderTopLeftRadius: 14,
 						height: "70px",
-						paddingTop: "18px"
+						paddingTop: "26px"
 					};	
+					
+					var buttonBox = {
+						width: "40%",
+						margin: "10px auto 20px auto"
+					}
+					var dateInputStyle = {
+						marginRight: "20px"
+					}
 					
 					return (
 						<div style={clockStyle}>
@@ -387,11 +397,13 @@
 							</div>
 							<form id="dateForm" style={formStyle}>
 								<label htmlFor="myDate">Date:</label>
-								<input type="date" id="myDate"></input>
+								<input type="date" id="myDate" style={dateInputStyle}></input>
 								<label htmlFor="myTime">Time:</label>
 								<input type="time" id="myTime"></input>
-								<button type="button" onClick={ () => this.updateDateAndTime()}>Update</button>
-								<button type="button" onClick={ () => this.reset()}>Reset</button>
+								<div style={buttonBox}>
+									<button type="button" style={{marginRight: '30px'}} onClick={ () => this.updateDateAndTime()}>Update</button>
+									<button type="button" onClick={ () => this.reset()}>Reset</button>
+								</div>
 							</form>
 						</div>
 					);										
