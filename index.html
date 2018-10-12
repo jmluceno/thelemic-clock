@@ -37,48 +37,31 @@
 		<script type="text/babel">			
 			class App extends React.Component {
 				render() {
-					var appStyle = {
-						width: 500,
+					var appContainerStyle = {
+						margin: "0px auto",
+						width: "500px",
 						border: "5px solid black",
-						borderRadius: 20,
-						margin: "0 auto 0 auto"
-					};	
+						borderRadius: 20
+					};
+					
 					return (
-						<div style={appStyle}>
-							<Header />
+						<div style={appContainerStyle}>
 							<Clock />
 						</div>
 					)
 				}
 			}
-			class Header extends React.Component {
-				render() {				
-					var titleBoxStyle = {
-						width: "100%",
-						backgroundColor: "#001489",
-						color: "#FFF",
-						textAlign: "center",
-						fontSize: "2.5em",
-						borderTopRightRadius: 15,
-						borderTopLeftRadius: 15,
-						height: "70px",
-						fontFamily: "Quicksand",
-						paddingTop: "12px",
-						fontWeight: "bold"
-					};				
-					return (
-						<div style={titleBoxStyle}>
-							Thelemic Date & Time
-						</div>
-					)
-				}
-			}
+			
 			class Clock extends React.Component {
 				constructor(props) {
 					super(props);					
 					this.state = {
 						date: "",
 						time: "",
+						solKingScale: "",
+						lunaKingScale: "",
+						dayScale: "",
+						yearScale: "",
 						autoUpdate: true
 					}									
 				}
@@ -140,14 +123,27 @@
 					var moonData = doMoon(observer,0);
 					var sunHouseIndex = this.determineHouseIndex(sunData.rightAscension);
 					var moonHouseIndex = this.determineHouseIndex(moonData.rightAscension);
-					var sunHouseName = this.converter(sunHouseIndex, "h");
-					var moonHouseName = this.converter(moonHouseIndex, "h");
+					var sunHouseName = this.convertToAstrologicalFont(sunHouseIndex, "h");
+					var moonHouseName = this.convertToAstrologicalFont(moonHouseIndex, "h");
+					var sunHexColor = this.getKingScale(sunHouseIndex, "h");
+					var moonHexColor = this.getKingScale(moonHouseIndex, "h");
+					this.setState({
+						solKingScale: sunHexColor
+					});
+					this.setState({
+						lunaKingScale: moonHexColor
+					});
 					var dd = new Date(d);
 					var dayOfWeek = dd.getDay();										
 					var dateOutput = this.calculateThelemicYear(dd, sunHouseIndex);
 					var sunDegree = this.determineDegree(sunData.rightAscension);
 					var moonDegree = this.determineDegree(moonData.rightAscension);
-					var thelemicDay = this.converter(dayOfWeek, "d");
+					var thelemicDay = this.convertToAstrologicalFont(dayOfWeek, "d");
+					var dayColor = this.getKingScale(dayOfWeek, "d");
+					this.setState({
+						dayScale: dayColor
+					});
+					
 					var dataObject = {
 						sunHouseName: sunHouseName,
 						moonHouseName: moonHouseName,
@@ -180,6 +176,10 @@
 					} else {
 						var thelemicYear = this.roman(y1,1).toLowerCase();
 					}
+					var yearColor = this.getKingScale(y1, "y");
+					this.setState({
+						yearScale: yearColor
+					});
 					return dod + thelemicYear;
 				}
 				determineHouseIndex(hour) {
@@ -188,7 +188,7 @@
 				determineDegree(hour) {
 					return Math.round((hour * 15) % 30);
 				};
-				converter(i, houseOrDay) { //index number, house = h, day = d
+				convertToAstrologicalFont(i, houseOrDay) { //index number, house = h, day = d
 					var houseSym = [
 						"!", //aries
 						"=",
@@ -216,6 +216,62 @@
 						return houseSym[i];
 					} else if (houseOrDay == "d") {
 						return daySym[i];
+					}
+				}
+				getKingScale(i, houseOrDayOrYear) {
+					var houseScale = [
+						"#F2301B", //aries
+						"#FF4E00", //taur
+						"#FF6D00", //gem
+						"#FFB734", //canc
+						"#E5D708", //leo
+						"#59B934", //virgo
+						"#00A550", //libra
+						"#00958D", //scor
+						"#0085CA", //sag
+						"#001489", //cap
+						"#440099", //aq
+						"#AE0E36"	//pisces				
+					];
+					var planetScale = [
+						"#FF6D00", //sol, sunday
+						"#0085CA", //moon, monday, etc.
+						"#ED2000", //tues
+						"#FEDD00", //wed
+						"#7F14AA", //mars
+						"#00A550", //fr
+						"#001489" //sat
+					];
+					var yearScale = [
+						"#FEE74D", //0, aleph
+						"#FEDD00", //bet
+						"#0085CA", //gimel
+						"#00A550", //dalet
+						"#440099", //heh, aqu
+						"#FF4E00", //vau, taur
+						"#FF6D00", //gem, zayin
+						"#FFB734", //canc, Het
+						"#E5D708", //leo, Tet
+						"#59B934", //virgo, Yod
+						"#ED2000", //jupiter, Kaph
+						"#00A550", //libra, Lamed
+						"#004DAB", //water, mem
+						"#00958D", //scor, Nun
+						"#0085CA", //sag, Samekh
+						"#001489", //cap, Ayin
+						"#7F14AA", //peh, mars
+						"#F2301B", //aries, Tzaddi
+						"#AE0E36",	//pisces, Qoph
+						"#FF6D00", //sol, Resh
+						"#FF2A00", //shin, fire
+						"#001489" //sat, tau						
+					];
+					if (houseOrDayOrYear == "h") {
+						return houseScale[i];
+					} else if (houseOrDayOrYear == "d") {
+						return planetScale[i];
+					} else {
+						return yearScale[i];
 					}
 				}
 				// Convert to Roman Numerals
@@ -264,13 +320,71 @@
 					var formStyle = {
 						paddingBottom: "20px"
 					}
+					var solContainer = {
+						width: "100%",
+						borderRadius: 20,
+						textAlign: "center",
+						backgroundColor: this.state.solKingScale,
+						marginBottom: "20px"
+					}
+					var moonContainer = {
+						width: "100%",
+						borderRadius: 20,
+						textAlign: "center",
+						backgroundColor: this.state.lunaKingScale,
+						marginBottom: "20px"
+					}
+					var dayContainer = {
+						width: "47.5%",
+						borderRadius: 20,
+						textAlign: "center",
+						backgroundColor: this.state.dayScale,
+						marginBottom: "20px",
+						float: "left",
+						marginRight: "20px"
+					}
+					var yearContainer = {
+						width: "47.5%",
+						height: "82px",
+						borderRadius: 20,
+						textAlign: "center",
+						backgroundColor: this.state.yearScale,
+						marginBottom: "20px",
+						float: "left"
+					}
+					var transparentCover = {
+						padding: "20px 0",
+						backgroundColor: "rgba(0,0,0,0.3)",
+						borderRadius: 20
+					}
+					var colorDisplay = {
+						color: "#fff",
+						width: "93%",
+						margin: "20px auto 10px auto"
+					}
+					var titleBoxStyle = {
+						width: "100%",
+						backgroundColor: "#000",
+						color: "#FFF",
+						textAlign: "center",
+						fontSize: "1.5em",
+						borderTopRightRadius: 14,
+						borderTopLeftRadius: 14,
+						height: "70px",
+						paddingTop: "18px"
+					};	
 					
 					return (
 						<div style={clockStyle}>
-							<h2><span className="astrological">}</span> in {this.state.sunDegree}&deg; <span className="astrological">{this.state.sunHouseName}</span></h2> 
-							<h2><span className="astrological">~</span> in {this.state.moonDegree}&deg; <span className="astrological">{this.state.moonHouseName}</span></h2>
-							<h2><span className="astrological">{this.state.thelemicDay}</span> &bull; {this.state.thelemicYear}</h2>
-							<h2>{this.state.date} {this.state.time}</h2>							
+							<div style={titleBoxStyle}>
+								{this.state.date} {this.state.time}
+							</div>
+							<div style={colorDisplay}>
+								<div style={solContainer}><div style={transparentCover}><span className="astrological">}</span> in {this.state.sunDegree}&deg; <span className="astrological">{this.state.sunHouseName}</span></div></div>
+								<div style={moonContainer}><div style={transparentCover}><span className="astrological">~</span> in {this.state.moonDegree}&deg; <span className="astrological">{this.state.moonHouseName}</span></div></div>
+								<div style={dayContainer}><div style={transparentCover}><span className="astrological">{this.state.thelemicDay}</span></div></div>
+								<div style={yearContainer}><div className="transparentCover">{this.state.thelemicYear}</div></div>							
+							</div>
 							<form id="dateForm" style={formStyle}>
 								<label htmlFor="myDate">Date:</label>
 								<input type="date" id="myDate"></input>
