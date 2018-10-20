@@ -82,15 +82,26 @@
 					this.setTimer();
 				}
 				
-				componentDidUpdate() {
-					if (this.state.autoUpdate == false) {						
-						clearInterval(this.timerID);
-					} 
+				setTimer() {
+					this.timerID = setTimeout(
+							() => this.tick(),
+							1000
+						);	
 				}
-				componentWillUnmount() {
-					clearInterval(this.timerID);
+				tick() {					
+					var d = new Date();
+					this.setState({
+					  date: d.toLocaleDateString(),
+					  time: d.toLocaleTimeString()
+					});
+					var sunAndMoonData = this.getData(observer, d);
+					this.setState((state) => { 
+						return sunAndMoonData;
+					});
+					if (this.state.autoUpdate == true) {
+						this.setTimer();
+					}					
 				}
-				
 				convertDegrees(degrees) { //converts from degrees to dd:mm:ss
 					var dd = Math.floor(degrees);
 					var mm = Math.floor(((degrees - dd) * 60));
@@ -98,25 +109,6 @@
 					return dd + ":" + mm + ":" + ss;
 				}
 						
-				setTimer() {
-					this.timerID = setInterval(
-							() => this.tick(),
-							1000
-						);	
-				}
-				tick() {
-					if (this.state.autoUpdate == true) {
-						var d = new Date();
-						this.setState({
-						  date: d.toLocaleDateString(),
-						  time: d.toLocaleTimeString()
-						});
-						var sunAndMoonData = this.getData(observer, d);
-						this.setState((state) => { 
-							return sunAndMoonData;
-						});
-					}
-				}
 				getData(observer, d) {
 					observer.setDate(d);
 					var sunData = doSun(observer,0);
