@@ -89,16 +89,16 @@
 						);	
 				}
 				tick() {					
-					var d = new Date();
-					this.setState({
-					  date: d.toLocaleDateString(),
-					  time: d.toLocaleTimeString()
-					});
-					var sunAndMoonData = this.getData(observer, d);
-					this.setState((state) => { 
-						return sunAndMoonData;
-					});
 					if (this.state.autoUpdate == true) {
+						var d = new Date();
+						this.setState({
+						  date: d.toLocaleDateString(),
+						  time: d.toLocaleTimeString()
+						});
+						var sunAndMoonData = this.getData(observer, d);
+						this.setState((state) => { 
+							return sunAndMoonData;
+						});					
 						this.setTimer();
 					}					
 				}
