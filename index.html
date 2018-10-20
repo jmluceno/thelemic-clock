@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Clock</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Thelemic Date & Time</title>
 		<!--React dev-->
 		<script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
 		<script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
@@ -39,7 +40,7 @@
 				render() {
 					var appContainerStyle = {
 						margin: "0px auto",
-						width: "500px",
+						maxWidth: "500px",
 						border: "5px solid black",
 						borderRadius: 20
 					};
@@ -310,14 +311,13 @@
 				}
 				
 				render() {	
-					var clockStyle = {
-						textAlign: "center",
-						fontSize: "34px"
-					}
+					
 					var formStyle = {
-						paddingBottom: "20px",
+						paddingBottom: "10px",
 						clear: "both",
-						fontSize: "24px"
+						fontSize: "24px",
+						width: "100%",
+						color: "#000"
 					}
 					var solContainer = {
 						width: "100%",
@@ -334,22 +334,10 @@
 						marginBottom: "20px"
 					}
 					var dayContainer = {
-						width: "47.5%",
-						borderRadius: 20,
-						textAlign: "center",
-						backgroundColor: this.state.dayScale,
-						marginBottom: "20px",
-						float: "left",
-						marginRight: "20px"
+						backgroundColor: this.state.dayScale
 					}
 					var yearContainer = {
-						width: "47.5%",
-						height: "94px",
-						borderRadius: 20,
-						textAlign: "center",
-						backgroundColor: this.state.yearScale,
-						marginBottom: "20px",
-						float: "left"
+						backgroundColor: this.state.yearScale
 					}
 					var transparentCover = {
 						padding: "20px 0",
@@ -362,45 +350,51 @@
 						margin: "20px auto 10px auto"
 
 					}
-					var titleBoxStyle = {
-						width: "100%",
-						backgroundColor: "#000",
-						color: "#FFF",
-						textAlign: "center",
-						borderTopRightRadius: 14,
-						borderTopLeftRadius: 14,
-						height: "70px",
-						paddingTop: "26px"
-					};	
-					
 					var buttonBox = {
 						width: "40%",
-						margin: "10px auto 20px auto"
+						margin: "0px auto",
+						paddingTop: "15px",
+						clear: "both"
 					}
 					var dateInputStyle = {
 						marginRight: "20px"
 					}
+					var labelStyle = {
+						marginRight: "10px"
+					}
+					var buttonStyle = {
+						fontSize: "24px",
+						borderRadius: "20px",
+						padding: "10px",
+						backgroundColor: "#fff",
+						color: "#000"
+					}
 					
 					return (
-						<div style={clockStyle}>
-							<div style={titleBoxStyle}>
-								{this.state.date} {this.state.time}
+						<div id="clock">
+							<div id="titleBox">
+								<span>{this.state.date}</span> <span id="timeDisplay">{this.state.time}</span>
 							</div>
 							<div style={colorDisplay}>
 								<div style={solContainer}><div style={transparentCover}><span className="astrological">}</span> in {this.state.sunDegree}&deg; <span className="astrological">{this.state.sunHouseName}</span></div></div>
 								<div style={moonContainer}><div style={transparentCover}><span className="astrological">~</span> in {this.state.moonDegree}&deg; <span className="astrological">{this.state.moonHouseName}</span></div></div>
-								<div style={dayContainer}><div style={transparentCover}><span className="astrological">{this.state.thelemicDay}</span></div></div>
-								<div style={yearContainer}><div className="transparentCover">{this.state.thelemicYear}</div></div>							
+								<div id="dayContainer" style={dayContainer}><div style={transparentCover}><span className="astrological">{this.state.thelemicDay}</span></div></div>
+								<div id="yearContainer" style={yearContainer}><div className="yearCover">{this.state.thelemicYear}</div></div>							
+							
+								<form id="dateForm" style={formStyle}>
+									<div id="dateBox">
+										<label htmlFor="myDate" style={labelStyle}>Date:</label>
+										<input type="date" id="myDate" style={dateInputStyle} onInput={ () => this.updateDateAndTime()}></input>
+									</div>
+									<div id="timeBox">
+										<label htmlFor="myTime" style={labelStyle}>Time:</label>
+										<input type="time" id="myTime" onInput={ () => this.updateDateAndTime()}></input>
+									</div>
+									<div style={buttonBox}>
+										<button style={buttonStyle} type="button" onClick={ () => this.reset()}>Reset</button>
+									</div>
+								</form>
 							</div>
-							<form id="dateForm" style={formStyle}>
-								<label htmlFor="myDate">Date:</label>
-								<input type="date" id="myDate" style={dateInputStyle} onInput={ () => this.updateDateAndTime()}></input>
-								<label htmlFor="myTime">Time:</label>
-								<input type="time" id="myTime" onInput={ () => this.updateDateAndTime()}></input>
-								<div style={buttonBox}>
-									<button type="button" onClick={ () => this.reset()}>Reset</button>
-								</div>
-							</form>
 						</div>
 					);										
 				}
