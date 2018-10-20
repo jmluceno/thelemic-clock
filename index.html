@@ -303,6 +303,11 @@
 					this.setTimer();
 					document.getElementById("dateForm").reset();
 				}
+				checkForDateAndTime() {
+					if (document.getElementById("myDate").value) {
+						this.updateDateAndTime();
+					}
+				}
 				
 				render() {	
 					var clockStyle = {
@@ -389,11 +394,10 @@
 							</div>
 							<form id="dateForm" style={formStyle}>
 								<label htmlFor="myDate">Date:</label>
-								<input type="date" id="myDate" style={dateInputStyle}></input>
+								<input type="date" id="myDate" style={dateInputStyle} onInput={ () => this.updateDateAndTime()}></input>
 								<label htmlFor="myTime">Time:</label>
-								<input type="time" id="myTime"></input>
+								<input type="time" id="myTime" onInput={ () => this.updateDateAndTime()}></input>
 								<div style={buttonBox}>
-									<button type="button" style={{marginRight: '30px'}} onClick={ () => this.updateDateAndTime()}>Update</button>
 									<button type="button" onClick={ () => this.reset()}>Reset</button>
 								</div>
 							</form>
