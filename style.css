@@ -1,3 +1,16 @@
+/* RESPONSIVE */
+
+/* will not validate --------- */
+html { 
+	-webkit-text-size-adjust: 100%; 	/* don't resize body copy on iPhone */
+}
+
+@-ms-viewport,		/* IE10 */
+@viewport	{		/* future browsers */
+    width: extend-to-zoom;
+    zoom: 1.0;
+}
+/* --------- end will not validate */
 @font-face {
 	font-family: 'Astrological';
 	src:url('fonts/Astrological.ttf.woff') format('woff'),
@@ -16,9 +29,58 @@ body {
 	font-family: 'Astrological';
 }
 
-.transparentCover {
+.yearCover {
 	padding: 27px 0 20px 0;
 	background-color: rgba(0,0,0,0.3);
 	border-radius: 20px;
 	height: 47px;
+}
+#clock {
+	text-align: center;
+	font-size: 34px;
+}
+#titleBox {
+	width: 100%;
+	background-color: #000;
+	color: #FFF;
+	text-align: center;
+	border-top-right-radius: 14px;
+	border-top-left-radius: 14px;
+	height: 70px;
+	padding-top: 26px;
+}
+
+#dayContainer {
+	width: 47.5%;
+	border-radius: 20px;
+	text-align: center;
+	margin-bottom: 20px;
+	float: left;
+	margin-right: 20px;
+}		
+#yearContainer {
+	width: 47.5%;
+	height: 94px;
+	border-radius: 20px;
+	text-align: center;
+	margin-bottom: 20px;
+	float: left;
+}
+#dateBox, #timeBox {
+	float: left;
+}
+
+@media (max-width: 456px) {
+	#dayContainer, #yearContainer {
+		float: none;
+		width: 100%;
+	}
+}
+@media (max-width: 400px) {
+	#timeDisplay {
+		display: block;
+	}
+	#titleBox {
+		padding-bottom: 35px;
+	}
 }
